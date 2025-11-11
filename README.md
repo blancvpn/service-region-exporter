@@ -28,8 +28,10 @@ docker run -d \
   -p 9999:9999 \
   -e CHECK_INTERVAL=60 \
   -e EXPECTED_REGION=US \
-  ghcr.io/blancvpn/service-region-exporter:latest
+  blancvpn/service-region-exporter:latest
 ```
+
+You can also use the image from GitHub Container Registry: `ghcr.io/blancvpn/service-region-exporter:latest`
 
 ### From release
 
@@ -57,9 +59,9 @@ Configure via command-line flags or environment variables.
 ```bash
 # Flags
 ./region-exporter \
-  --metrics-port 9999 \
-  --check-interval 60 \
-  --check-expected-region US
+  --metrics-port=9999 \
+  --check-interval=60 \
+  --check-expected-region=US
 
 # Environment variables
 export METRICS_PORT=9999
@@ -106,14 +108,14 @@ Enable/disable individual services:
 
 ```bash
 ./region-exporter \
-  --metrics-port 9999 \
-  --metrics-username admin \
-  --metrics-password secure-pass \
-  --check-interval 60 \
-  --check-expected-region US \
-  --network-proxy socks5://127.0.0.1:1080 \
-  --network-ipv4-only \
-  --service-netflix-enabled false
+  --metrics-port=9999 \
+  --metrics-username=admin \
+  --metrics-password=secure-pass \
+  --check-interval=60 \
+  --check-expected-region=US \
+  --network-proxy=socks5://127.0.0.1:1080 \
+  --network-ipv4-only=true   \
+  --service-netflix-enabled=false
 ```
 
 ## 📊 Usage
@@ -187,7 +189,7 @@ version: "3.8"
 
 services:
   region-exporter:
-    image: ghcr.io/blancvpn/service-region-exporter:latest
+    image: blancvpn/service-region-exporter:latest
     container_name: region-exporter
     ports:
       - "9999:9999"
@@ -212,7 +214,7 @@ services:
 ### Using with proxy
 
 ```bash
-./region-exporter --network-proxy socks5://proxy.example.com:1080
+./region-exporter --network-proxy=socks5://proxy.example.com:1080
 ```
 
 ### IPv4/IPv6 only
@@ -225,7 +227,7 @@ services:
 ### Custom network interface
 
 ```bash
-./region-exporter --network-interface eth0
+./region-exporter --network-interface=eth0
 ```
 
 ## 🚨 Monitoring & Alerting
