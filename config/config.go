@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/alecthomas/kong"
 )
 
@@ -9,7 +11,7 @@ var CLIConfig CLI
 func Parse(version string) {
 	ctx := kong.Parse(&CLIConfig,
 		kong.Name("region-exporter"),
-		kong.Description("Region Exporter: A Prometheus exporter for monitoring services region detection"),
+		kong.Description("Region Exporter: A Prometheus exporter for monitoring service region detection"),
 		kong.Vars{
 			"version": version,
 		},
@@ -132,7 +134,10 @@ type VersionFlag string
 func (v VersionFlag) Decode(ctx *kong.DecodeContext) error { return nil }
 func (v VersionFlag) IsBool() bool                         { return true }
 func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
-	println("region-exporter version", vars["version"])
+	fmt.Println("Region Exporter: A Prometheus exporter for monitoring services region detection")
+	fmt.Printf("Version:\t %s\n", vars["version"])
+	fmt.Printf("GitHub: https://github.com/blancvpn/service-region-exporter\n")
+	fmt.Println("Made with ❤️ by BlancVPN")
 	app.Exit(0)
 	return nil
 }
