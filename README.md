@@ -1,5 +1,11 @@
 # 🌍 Service Region Exporter
 
+[![GitHub Release](https://img.shields.io/github/v/release/blancvpn/service-region-exporter?style=flat&color=blue)](https://github.com/blancvpn/service-region-exporter/releases/latest)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/blancvpn/service-region-exporter/build-publish.yml)](https://github.com/blancvpn/service-region-exporter/actions/workflows/build-publish.yml)
+[![DockerHub](https://img.shields.io/badge/DockerHub-blancvpn%2Fservice--region--exporter-blue)](https://hub.docker.com/r/blancvpn/service-region-exporter/)
+[![ghcr.io](https://img.shields.io/badge/ghcr.io-blancvpn%2Fservice--region--exporter-blue)](https://github.com/blancvpn/service-region-exporter/pkgs/container/service-region-exporter)
+[![GitHub License](https://img.shields.io/github/license/blancvpn/service-region-exporter?color=greeen)](https://github.com/blancvpn/service-region-exporter/blob/main/LICENSE)
+
 Prometheus exporter that monitors and verifies geographic region detection by various online services. It checks which region popular services detect for your server IP and exports metrics for monitoring.
 
 ## ✨ Features
