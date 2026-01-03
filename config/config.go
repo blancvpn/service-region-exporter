@@ -71,7 +71,7 @@ type CLI struct {
 
 		Spotify struct {
 			Enabled bool   `name:"enabled" help:"Enable Spotify region check" default:"true" env:"SPOTIFY_ENABLED"`
-			URL     string `name:"url" help:"Spotify URL" default:"https://accounts.spotify.com/en/login" env:"SPOTIFY_URL"`
+			URL     string `name:"url" help:"Spotify URL" default:"https://accounts.spotify.com/status" env:"SPOTIFY_URL"`
 		} `embed:"" prefix:"spotify-"`
 
 		Deezer struct {
