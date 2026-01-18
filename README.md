@@ -18,6 +18,7 @@ Prometheus exporter that monitors and verifies geographic region detection by va
 - ⏱️ **Scheduled checks** — configurable check intervals
 - 🔐 **Basic Authentication** — optional metrics endpoint protection
 - 🐳 **Docker ready** — official image available
+- 🛡️ **IP Abuse Score** — optional AbuseIPDB integration for IP reputation monitoring
 
 ## 🎯 Supported Services
 
@@ -109,6 +110,12 @@ Enable/disable individual services:
 # ... and others (all enabled by default)
 ```
 
+#### 🛡️ AbuseIPDB (optional)
+
+- `--service-abuseipdb-token` / `ABUSEIPDB_TOKEN` — API token from [abuseipdb.com](https://www.abuseipdb.com/)
+
+When configured, exports `ip_abuse_confidence_score` metric (0-100) indicating IP reputation. Checks are rate-limited to once per hour to respect API limits.
+
 ### Advanced configuration example
 
 ```bash
@@ -139,6 +146,8 @@ curl http://localhost:9999/metrics
   - Labels: `service`, `ip`, `detected_region`, `expected_region`
 - `ip_service_latency_milliseconds` — request latency in milliseconds
   - Labels: `service`, `ip`
+- `ip_abuse_confidence_score` — AbuseIPDB confidence score (0-100), requires `ABUSEIPDB_TOKEN`
+  - Labels: `ip`
 
 **Prometheus configuration:**
 
@@ -256,6 +265,13 @@ groups:
         annotations:
           summary: "High latency for {{ $labels.service }}"
           description: "Latency {{ $value }}ms"
+
+      - alert: HighAbuseScore
+        expr: ip_abuse_confidence_score > 50
+        for: 5m
+        annotations:
+          summary: "High abuse score for IP {{ $labels.ip }}"
+          description: "AbuseIPDB confidence score: {{ $value }}"
 ```
 
 ## 🤝 Contributing
