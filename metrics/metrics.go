@@ -32,6 +32,16 @@ var (
 		},
 	)
 
+	AbuseConfidenceScore = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "ip_abuse_confidence_score",
+			Help: "AbuseIPDB confidence score (0-100) indicating how abusive the IP is",
+		},
+		[]string{
+			"ip",
+		},
+	)
+
 	registry *prometheus.Registry
 )
 
@@ -39,6 +49,7 @@ func Init() {
 	registry = prometheus.NewRegistry()
 	registry.MustRegister(ServiceRegionMatch)
 	registry.MustRegister(ServiceLatency)
+	registry.MustRegister(AbuseConfidenceScore)
 }
 
 func Handler() http.Handler {
@@ -73,4 +84,8 @@ func RecordMatch(service, ip, detectedRegion, expectedRegion string, matches boo
 
 func RecordLatency(service, ip string, latencyMs float64) {
 	ServiceLatency.WithLabelValues(service, ip).Set(latencyMs)
+}
+
+func RecordAbuseScore(ip string, score float64) {
+	AbuseConfidenceScore.WithLabelValues(ip).Set(score)
 }

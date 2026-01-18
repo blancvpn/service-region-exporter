@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"region-exporter/config"
@@ -26,7 +27,38 @@ func NewRedditService(client *http.Client) *RedditService {
 	}
 }
 
+var redditCountryRegex = regexp.MustCompile(`country="([A-Z]{2})"`)
+
 func (r *RedditService) CheckRegion() (string, error) {
+	if region, err := r.checkViaHTML(); err == nil && region != "" {
+		return region, nil
+	}
+
+	return r.checkViaAPI()
+}
+
+func (r *RedditService) checkViaHTML() (string, error) {
+	req, err := http.NewRequest("GET", r.url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+	body, err := r.makeRequest(req)
+	if err != nil {
+		return "", err
+	}
+
+	matches := redditCountryRegex.FindSubmatch(body)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("country code not found in HTML")
+	}
+
+	return string(matches[1]), nil
+}
+
+func (r *RedditService) checkViaAPI() (string, error) {
 	jsonBody := `{"scopes":["email"]}`
 	tokenReq, err := http.NewRequest("POST", "https://www.reddit.com/auth/v2/oauth/access-token/loid", strings.NewReader(jsonBody))
 	if err != nil {
@@ -80,7 +112,7 @@ func (r *RedditService) CheckRegion() (string, error) {
 	}
 
 	if locResp.Data.UserLocation.CountryCode == "" {
-		return "", fmt.Errorf("country code not found in response")
+		return "", fmt.Errorf("country code not found in API response")
 	}
 
 	return locResp.Data.UserLocation.CountryCode, nil

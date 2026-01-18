@@ -123,6 +123,10 @@ type CLI struct {
 			URL   string `name:"url" help:"IPInfo.io URL for IP detection" default:"https://ipinfo.io/json" env:"IPINFO_URL"`
 			Token string `name:"token" help:"IPInfo.io API token (optional)" default:"" env:"IPINFO_TOKEN"`
 		} `embed:"" prefix:"ipinfo-"`
+
+		AbuseIPDB struct {
+			Token string `name:"token" help:"AbuseIPDB API token (enables abuse score check if set)" default:"" env:"ABUSEIPDB_TOKEN"`
+		} `embed:"" prefix:"abuseipdb-"`
 	} `embed:"" prefix:"service-"`
 
 	Version VersionFlag `name:"version" help:"Print version information and quit"`

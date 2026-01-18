@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"region-exporter/config"
 )
 
 type YouTubeService struct {
 	BaseService
-	url string
+	url           string
+	googleService *GoogleService
 }
 
 func NewYouTubeService(client *http.Client) *YouTubeService {
@@ -21,11 +23,29 @@ func NewYouTubeService(client *http.Client) *YouTubeService {
 			client:  client,
 			enabled: cfg.Enabled,
 		},
-		url: cfg.URL,
+		url:           cfg.URL,
+		googleService: NewGoogleService(client),
 	}
 }
 
 func (y *YouTubeService) CheckRegion() (string, error) {
+	region, err := y.tryYouTube()
+	if err == nil && y.isValidRegion(region) {
+		return region, nil
+	}
+
+	googleRegion, googleErr := y.googleService.CheckRegion()
+	if googleErr == nil && googleRegion != "" {
+		return googleRegion, nil
+	}
+
+	if err != nil {
+		return "", err
+	}
+	return "", fmt.Errorf("countryCode not found in response")
+}
+
+func (y *YouTubeService) tryYouTube() (string, error) {
 	req, err := http.NewRequest("GET", y.url, nil)
 	if err != nil {
 		return "", err
@@ -46,4 +66,18 @@ func (y *YouTubeService) CheckRegion() (string, error) {
 	}
 
 	return "", fmt.Errorf("countryCode not found in response")
+}
+
+func (y *YouTubeService) isValidRegion(region string) bool {
+	if region == "" {
+		return false
+	}
+	lower := strings.ToLower(region)
+	if lower == "null" || lower == "n/a" {
+		return false
+	}
+	if len(region) > 7 {
+		return false
+	}
+	return true
 }

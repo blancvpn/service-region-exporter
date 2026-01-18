@@ -27,6 +27,44 @@ func NewGoogleService(client *http.Client) *GoogleService {
 }
 
 func (g *GoogleService) CheckRegion() (string, error) {
+	region, err := g.tryGoogleCom()
+	if err == nil && region != "" {
+		return region, nil
+	}
+
+	return g.tryPlayGoogle()
+}
+
+func (g *GoogleService) tryGoogleCom() (string, error) {
+	req, err := http.NewRequest("GET", "https://www.google.com", nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+
+	body, err := g.makeRequest(req)
+	if err != nil {
+		return "", err
+	}
+
+	re := regexp.MustCompile(`"[a-z]{2}_([A-Z]{2})"`)
+	matches := re.FindSubmatch(body)
+	if len(matches) > 1 {
+		return string(matches[1]), nil
+	}
+
+	re = regexp.MustCompile(`"[a-z]{2}-([A-Z]{2})"`)
+	matches = re.FindSubmatch(body)
+	if len(matches) > 1 {
+		return string(matches[1]), nil
+	}
+
+	return "", ErrRegionNotFound
+}
+
+func (g *GoogleService) tryPlayGoogle() (string, error) {
 	req, err := http.NewRequest("GET", g.url, nil)
 	if err != nil {
 		return "", err

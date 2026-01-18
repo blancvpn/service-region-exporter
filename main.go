@@ -24,11 +24,12 @@ var (
 )
 
 type App struct {
-	client         *http.Client
-	services       []services.Service
-	serverIP       string
-	expectedRegion string
-	servicesData   []models.ServiceStatus
+	client           *http.Client
+	services         []services.Service
+	abuseIPDBChecker *services.AbuseIPDBChecker
+	serverIP         string
+	expectedRegion   string
+	servicesData     []models.ServiceStatus
 }
 
 func NewApp() *App {
@@ -45,7 +46,8 @@ func NewApp() *App {
 	}
 
 	app := &App{
-		client: client,
+		client:           client,
+		abuseIPDBChecker: services.NewAbuseIPDBChecker(client),
 	}
 
 	app.services = services.GetAllServices(client)
@@ -65,6 +67,8 @@ func (a *App) runChecks() {
 			a.servicesData = append(a.servicesData, status)
 		}
 	}
+
+	a.abuseIPDBChecker.Check(a.serverIP)
 
 	web.UpdateData(a.serverIP, a.expectedRegion, a.servicesData)
 
